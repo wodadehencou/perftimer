@@ -20,21 +20,20 @@ type Timer struct {
 }
 
 func New() *Timer {
-	t := &Timer{
-		points: make([]Point, 1),
-		maxDur: 0,
-	}
-	t.points[0].msg = "start"
-	t.points[0].t = time.Now()
-	t.points[0].dur = 0
-	t.points[0].next = time.Now()
-
+	t := new(Timer)
+	t.Reset()
+	return t
 	return t
 }
 
 func (t *Timer) SetPoint(msg string) {
 	now := time.Now()
-	dur := now.Sub(t.points[len(t.points)-1].t)
+	var dur time.Duration
+	if len(t.points) == 0 {
+		dur = 0
+	} else {
+		dur = now.Sub(t.points[len(t.points)-1].t)
+	}
 	t.points = append(t.points, Point{
 		msg: msg,
 		t:   now,
@@ -62,13 +61,32 @@ func (t *Timer) SetPoint(msg string) {
 func (t *Timer) Report() {
 
 	tab := table.NewWriter()
-	tab.AppendHeader(table.Row{"#", "step", "time", "duration", "total"})
+	tab.AppendHeader(table.Row{
+		"#",
+		"step",
+		// "time",
+		"duration",
+		"total",
+	})
 
 	total := time.Duration(0)
-	for i, p := range t.points {
+	for i, p := range t.points[1:] {
 		total += p.dur
-		tab.AppendRow(table.Row{i, p.msg, p.t.Format(TimeFormat), p.dur.String(), total.String(), arrow(t.maxDur, p.dur)})
+		tab.AppendRow(table.Row{
+			i,
+			p.msg,
+			// p.t.Format(TimeFormat),
+			p.dur.String(),
+			total.String(),
+			arrow(t.maxDur, p.dur),
+		})
 	}
 
 	fmt.Println(tab.Render())
+}
+
+func (t *Timer) Reset() {
+	t.points = make([]Point, 0)
+	t.maxDur = 0
+	t.SetPoint("start")
 }
