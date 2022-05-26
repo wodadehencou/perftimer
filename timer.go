@@ -88,9 +88,9 @@ func (t *Timer) Report() {
 	tab.AppendHeader(table.Row{
 		"#",
 		"step",
-		"time",
+		// "time",
 		"duration",
-		// "total",
+		"total",
 	})
 
 	points := make(PointList, 0)
@@ -101,15 +101,14 @@ func (t *Timer) Report() {
 
 	sort.Sort(points)
 
-	total := time.Duration(0)
+	start := points[0].t
 	for i, p := range points {
-		total += p.dur
 		tab.AppendRow(table.Row{
 			i,
 			p.msg,
-			p.t.Format(TimeFormat),
+			// p.t.Format(TimeFormat),
 			p.dur.String(),
-			// total.String(),
+			p.t.Sub(start).String(),
 			arrow(t.maxDur, p.dur),
 		})
 	}
