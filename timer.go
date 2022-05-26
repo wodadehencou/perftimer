@@ -94,7 +94,7 @@ func (t *Timer) Report() {
 	})
 
 	points := make(PointList, 0)
-	t.points.Range(func(key, value any) bool {
+	t.points.Range(func(key, value interface{}) bool {
 		points = append(points, value.(*Point))
 		return true
 	})
